@@ -507,4 +507,42 @@ const updateEmployeeManager = () => {
     });
   };
 
+  // Delete a Role
+const removeRole = () => {
+    let sql = `SELECT role.id, role.title FROM role`;
+  
+    connection.promise().query(sql, (error, response) => {
+      if (error) throw error;
+      let roleNamesArray = [];
+      response.forEach((role) => { roleNamesArray.push(role.title); });
+  
+      inquirer
+        .prompt([
+          {
+            name: 'chosenRole',
+            type: 'list',
+            message: 'Which role would you like to remove?',
+            choices: roleNamesArray
+          }
+        ])
+        .then((answer) => {
+          let roleId;
+  
+          response.forEach((role) => {
+            if (answer.chosenRole === role.title) {
+              roleId = role.id;
+            }
+          });
+  
+          let sql = `DELETE FROM role WHERE role.id = ?`;
+          connection.promise().query(sql, [roleId], (error) => {
+            if (error) throw error;
+            console.log(chalk.redBright.bold(`====================================================================================`));
+            console.log(chalk.yellowBright(`Role Successfully Removed`));
+            console.log(chalk.redBright.bold(`====================================================================================`));
+            viewAllRoles();
+          });
+        });
+    });
+  };
   
